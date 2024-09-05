@@ -67,6 +67,6 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 ## Acknowledgements
 - Thanks to the open-source community for providing valuable resources and tools.
-- Special thanks to [Your Name] for developing this project.
+- Special thanks to Dr. Elvis Twumasi for inspiring the development of this project.
 
 
