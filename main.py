@@ -6,16 +6,16 @@ import modules.jacobian as jac
 
 def main():
     #Obtain the admittance matrix
-    #admittance_matrix = ymg.admittance_matrix()
+    admittance_matrix = ymg.admittance_matrix()
 
     # Example admittance matrix Y for a 3-bus system
-    admittance_matrix = np.array([
-    [-15j, 10j, 5j],
-    [10j, -15j, 5j],
-    [5j, 5j, -10j]
-])
+    '''admittance_matrix = np.array([
+    [0 - 7.5j, 0 + 2.5j, 0 + 5.0j],
+    [0 + 2.5j, 0 - 6.5j, 0 + 4.0j],
+    [0 + 5.0j, 0 + 4.0j, 0 - 9.0j]
+    ])'''
 
-    admittance_matrix = np.round(admittance_matrix, 2)
+    admittance_matrix = np.round(admittance_matrix, 4)
     #polar_matrix = ymg.admittance_to_polar(admittance_matrix)
     #print("Admittance Matrix in Polar Form:\n", polar_matrix)
 
@@ -26,10 +26,8 @@ def main():
     # Initialize iteration count
     iteration_count = 0
     max_iterations = 100  # Maximum number of iterations to prevent infinite loops
-    converging = False
 
-
-    while not converging:
+    while True:
         # Calculate the power at each bus
         calculated_power = cp.calculated_power(bus_data, admittance_matrix, len(admittance_matrix))
         print("Calculated Power:\n", calculated_power)
@@ -49,16 +47,16 @@ def main():
             bus_type = bus["type"]
             if bus_type == "PQ":
                 # For PQ buses, both active and reactive power should be considered
-                power_mismatch[index] = np.round(bus["P"] - calculated_power[index], 3)
+                power_mismatch[index] = np.round(bus["P"] - calculated_power[index], 4)
                 print("P: ", bus["P"])
                 print("Calculated Power: ", calculated_power[index])
-                power_mismatch[index + 1] = np.round(bus["Q"] - calculated_power[index + 1], 3)
+                power_mismatch[index + 1] = np.round(bus["Q"] - calculated_power[index + 1], 4)
                 print("Q: ", bus["Q"])
                 print("Calculated Reactive Power: ", calculated_power[index + 1])
                 index += 2
             elif bus_type == "PV":
                 # For PV buses, only active power mismatch is considered
-                power_mismatch[index] = np.round(bus["P"] - calculated_power[index], 3)
+                power_mismatch[index] = np.round(bus["P"] - calculated_power[index], 4)
                 print("P: ", bus["P"])
                 print("Calculated Power: ", calculated_power[index])
                 index += 1
@@ -68,7 +66,9 @@ def main():
         max_mismatch = np.max(np.abs(power_mismatch))
         if max_mismatch <= tolerance:
             print("Power mismatch is within tolerance.")
-            converging = True
+            print("Final Bus Data:\n", bus_data)
+            print("Number of iterations: ", iteration_count)
+            break
 
         # Calculate the Jacobian matrix and its inverse
         jacobian_matrix = jac.jacobian(bus_data, admittance_matrix, len(admittance_matrix))
@@ -85,7 +85,7 @@ def main():
         change = np.array(change).astype(np.float64)
 
         # Now apply np.round without errors
-        change = np.round(change, 2)
+        change = np.round(change, 4)
         print("Change Vector:\n", change)
 
         num_buses = len(bus_data)

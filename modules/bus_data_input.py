@@ -16,7 +16,7 @@ def bus_data(n):
                 if voltage_input:
                     voltage = complex(voltage_input)
                     bus['Vmag'] = abs(voltage)
-                    bus['Vang'] = sp.deg(sp.arg(voltage)).evalf()
+                    bus['Vang'] = sp.arg(voltage).evalf()
 
                 else:
                     bus['Vmag'] = ""

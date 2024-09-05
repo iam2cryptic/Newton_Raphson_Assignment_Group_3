@@ -15,7 +15,7 @@ def generate_unknowns(bus_data):
 
 def power_equations_generator(bus_data, admittance_matrix, n):
     power_equations = []
-    admittance_matrix = np.round(admittance_matrix, 2)
+    admittance_matrix = np.round(admittance_matrix, 4)
 
     # Convert admittance matrix to complex numbers if it's not already
 
@@ -35,8 +35,8 @@ def power_equations_generator(bus_data, admittance_matrix, n):
             Y_kn = admittance_matrix[bus_number, n]
 
             # Calculate power contributions
-            θ_kn = np.round(np.angle(Y_kn),2)  # Angle in radians
-            Y_kn_mag = np.round(np.abs(Y_kn),2)  # Magnitude
+            θ_kn = np.round(np.angle(Y_kn),4)  # Angle in radians
+            Y_kn_mag = np.round(np.abs(Y_kn),4)  # Magnitude
 
             # SymPy expressions for angle and magnitude
             cos_term = sp.cos(θ_kn + δ_n - δ_k)
@@ -44,8 +44,8 @@ def power_equations_generator(bus_data, admittance_matrix, n):
 
             P_k += V_k * V_n * Y_kn_mag * cos_term
             Q_k += V_k * V_n * Y_kn_mag * sin_term
-            P_k = P_k.evalf(2)
-            Q_k = Q_k.evalf(2)
+            P_k = P_k.evalf(4)
+            Q_k = Q_k.evalf(4)
 
         if bus['type'] == 'PQ':
             power_equations.append(P_k)

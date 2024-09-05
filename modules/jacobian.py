@@ -25,7 +25,7 @@ def jacobian(bus_data, admittance_matrix, n):
             differentiated_equation = sp.diff(power_equation, unknown)
             # Substitute the values and evaluate the result
             substituted_value = differentiated_equation.subs(substitution_dictionary)
-            jacobian_matrix[i, j] = substituted_value.evalf(2)
+            jacobian_matrix[i, j] = substituted_value.evalf(4)
     print("Jacobian Matrix:\n", jacobian_matrix)
     return jacobian_matrix
 

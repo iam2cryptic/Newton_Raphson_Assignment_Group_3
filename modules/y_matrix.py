@@ -15,4 +15,4 @@ def y_matrix(Z):
                     Y[i, j] = -1 / Z[i, j]
                 else:
                     Y[i, j] = 0
-    return np.round(Y, 2)
+    return np.round(Y, 4)
