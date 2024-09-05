@@ -2,8 +2,8 @@ import numpy as np
 
 def calculated_power(buses, Y, n):
     S = np.zeros((n, 1), dtype=complex)
-    assumed_voltage = buses[0]['Vmag']
-    assumed_angle = buses[0]['Vang']
+    assumed_voltage = 1 #buses[0]['Vmag']
+    assumed_angle = 0 #buses[0]['Vang']
 
     for bus in buses:
         if bus['type'] == "PQ" and bus['Vmag']== '' and bus['Vang'] == '':
@@ -18,11 +18,11 @@ def calculated_power(buses, Y, n):
         try:
             Vmag = float(bus['Vmag'])  # Ensure Vmag is a float
             Vang = float(bus['Vang'])  # Ensure Vang is a float
-            voltage.append(Vmag * np.exp(1j * np.deg2rad(Vang)))
+            voltage.append(Vmag * np.exp(1j * Vang))
         except (ValueError, KeyError) as e:
             print(f"Error converting bus data to voltage: {e}")
             return None
-
+    print(buses)
     voltage = np.array(voltage).reshape(-1, 1)
     print("Voltage:", voltage)
 
@@ -32,15 +32,24 @@ def calculated_power(buses, Y, n):
     # Calculate the power at each bus
     for i in range(n):
         Vi_conj = np.conjugate(voltage[i])
-        S[i] = np.round(Vi_conj * current[i], 2)
+        S[i] = np.round(Vi_conj * current[i], 4)
+
 
     # Deconstruct the power into real and reactive power
-    deconstructed_power = np.zeros((len(S) * 2, 1))
-    for i in range(len(S)):
-        deconstructed_power[i*2] = S[i].real
-        deconstructed_power[i*2+1] = -1 * S[i].imag
+    deconstructed_power_list = []
 
-    deconstructed_power = deconstructed_power[2:]
+    # Deconstruct the power into real and reactive power and flatten it into a column vector
+    for i, bus in enumerate(buses):
+        if bus['type'] == "Vθ":
+            continue
+        elif bus['type'] == "PQ":
+            deconstructed_power_list.extend([S[i].real, -S[i].imag])  # Add both real and reactive power
+        elif bus['type'] == 'PV':
+            deconstructed_power_list.append(S[i].real)  # Add only real power for PV buses
+
+    # Convert the list to a NumPy column vector (2D array with shape (n, 1))
+    deconstructed_power = np.array(deconstructed_power_list, dtype=float).reshape(-1, 1)
+
     return deconstructed_power
 
 
